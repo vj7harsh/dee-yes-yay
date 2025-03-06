@@ -18,7 +18,9 @@ class Visa:
                 count[n] = 0
         return ans
     
-    
+    def getLexoSmall(s):
+        return ""
+
 
 queries = ["+10", "+20", "+30", "-20"]
 diff = 10

@@ -54,6 +54,62 @@ def getMaxReview(s):
     else:
         return -1 * prefix[ml - 1] + prefix[mr] - prefix[ml -1]
 
+from collections import defaultdict
+import heapq
+def maxConnectionsVerified(frm, to, n, unverified):
+    unverified = set(unverified)
+    parent = {i: i for i in range(1, n + 1)}
+    rank = {i: 0 for i in range(1, n + 1)}
+    total_possible = 0
+    given_edges = len(frm)
+
+    def find(u):
+        if u != parent[u]:
+            parent[u] = find(parent[u])
+        return parent[u]
+
+    def union(u, v):
+        up = find(u)
+        vp = find(v)
+        if up != vp:
+            if rank[up] > rank[vp]:
+                parent[vp] = up
+            elif rank[up] < rank[vp]:
+                parent[up] = vp
+            else:
+                parent[vp] = up
+                rank[up] += 1
+
+    for u, v in zip(frm, to):
+        union(u, v)
+    
+    clusters = defaultdict(list)
+    cluster_status = defaultdict(bool)
+    for i in range(1, n + 1):
+        p = find(i)
+        clusters[p].append(i)
+        if i in unverified:
+            cluster_status[p] = True
+
+    unverified_clusters = []
+    verified_cluster = []
+
+    for p, c in clusters.items():
+        if cluster_status[p]:
+            heapq.heappush(unverified_clusters, -len(c))
+        else:
+            verified_cluster.extend(c)
+    
+    unv = -heapq.heappop(unverified_clusters)
+    ver = len(verified_cluster)
+
+    total_possible += ((unv + ver) * (unv + ver - 1)) / 2
+
+    while unverified_clusters:
+        l = -heapq.heappop(unverified_clusters)
+        total_possible += ((l) * (l- 1)) / 2
+    
+    return total_possible - given_edges
 
 def main():
     s = "1100111"    
